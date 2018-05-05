@@ -16,6 +16,7 @@ __이때 모든 컨테이너가 제대로 설치되지 않는다면 __
 를 입력하신 뒤 
 
 > docker-compose down 
+
 > docker-compose up -d
 
 를 순서대로 입력하시면 오류 없이 실행될 것입니다. 
