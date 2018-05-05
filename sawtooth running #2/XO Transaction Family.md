@@ -106,7 +106,7 @@ Player1의 차례에 Player2가 마킹을 시도
 Plyaer1이 이긴 경우(P1-WIN)
 ![Alt text](./img/9.png)
 
-더이상 마킹할 칸이 남아있지 않은 경우(TIE)
+더이상 마킹할 칸이 남아있지 않은 경우(TIE)  
 <img src="./img/10.png" height="200px"></img>
 
 
