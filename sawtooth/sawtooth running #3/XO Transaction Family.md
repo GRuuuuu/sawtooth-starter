@@ -20,7 +20,7 @@
 
 Java project를 생성한 뒤, sawtooth폴더는 src밑으로, protos와 pom.xml은 각각 알아서 추가해줍시다.
 
-![Alt text](./img/1.png)
+![Alt text](./img/1.PNG)
 
 프로젝트 구성을 마치고나서 build하게되면 pom.xml에 적힌 dependancy가 외부라이브러리로 다운받아지게되고 소스코드의 빨간줄이 사라지게 됩니다. (야-호!) 
 
@@ -46,19 +46,19 @@ Java project를 생성한 뒤, sawtooth폴더는 src밑으로, protos와 pom.xml
 `sawtooth-shell-default bash`가 실행되고 있는 상태부터 시작  
 구성을 끝낸 뒤의 자바 프로그램을 실행해봅시다.  
 현재는 아무런 트랜잭션이 오고가고 있지 않으므로 빈 화면입니다.
-![Alt text](./img/2.png)
+![Alt text](./img/2.PNG)
 
 
 두명의 플레이어의 key를 구성해준뒤, 게임판을 만들어봅시다.
-![Alt text](./img/3.png)
+![Alt text](./img/3.PNG)
 자바 프로그램에 game을 만들었다는 화면이 디스플레이 됩니다.
 
 다음 첫번째 플레이어부터 마킹을 시작해봅시다.
-![Alt text](./img/4.png)
+![Alt text](./img/4.PNG)
 java프로그램에서 트랜잭션의 결과를 확인할 수 있습니다.
 
 트랜잭션이 실패하였을 때 exception처리도 이곳에서 확인할 수 있습니다.
-![Alt text](./img/5.png)
+![Alt text](./img/5.PNG)
 
 
 ---
