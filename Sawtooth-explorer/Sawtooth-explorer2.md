@@ -31,7 +31,7 @@ xo create {Game name} --username jack --url http://rest-api:8008
 를 입력해 주세요, {} 부분에는 게임이름을 입력하시면 됩니다.
 여기까지 하고 익스플로러를 켜 보세요.
 
-![트랜잭션](./img/transacion.PNG)
+![트랜잭션](./img/transaction.PNG)
 
 바로 이렇게 트랜잭션 정보가 보입니다. 
 
@@ -46,7 +46,7 @@ $ xo take game 1 --username jill --url http://rest-api:8008
 
 두 개를 입력할 때마다 새로운 트랜잭션이 생겨날 것입니다. 
 
-![트랜잭션2](./img/transacion2.PNG)
+![트랜잭션2](./img/transaction2.PNG)
 
 서로 번갈아서 한 번씩 마킹한 뒤의 트랜잭션 뷰입니다. 
 
