@@ -5,7 +5,7 @@
 익스플로러를 설치 했으면 이제 소투스 프로그램을 실행시키고 트랜잭션 흐름을 봅시다! 
 XO 게임 (틱택토) 를 사용해서 볼 것입니다. XO게임은 다음 링크를 참조하세요.
 
-[XO게임 다운로드와 명령어 설명](./sawtooth/sawtooth running #2/XO Transaction Family.md)
+[XO게임 다운로드와 명령어 설명](https://github.com/GRuuuuu/Learning_Sawtooth/tree/master/sawtooth/sawtooth%20running%20%232)
 
 
 
