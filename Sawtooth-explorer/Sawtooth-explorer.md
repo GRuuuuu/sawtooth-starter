@@ -2,6 +2,7 @@
 =============
 ### 필자는 Window10 / docker 18.03.0-ce-win59 버전을 사용 하였습니다.
 
+도커를 실행시켜 주세요. 그리고
 먼저 이곳에서 파일을 다운 받아주세요. 
 > <https://github.com/hyperledger/sawtooth-explorer>
 
@@ -18,8 +19,12 @@
 를 입력하신 뒤 
 
 > docker-compose down 
+
 위 명령어는 컨테이너를 삭제하는 명령어입니다. 
 > docker-compose up -d
 
 를 순서대로 입력하시면 오류 없이 실행될 것입니다. 
-Ctrl + c 를 통해서 언제든 실행 중인 컨테이너를 멈출 수 있습니다. 
+또한, Ctrl + c 를 통해서 언제든 실행 중인 컨테이너를 멈출 수 있습니다!
+
+제대로 설치되었다면, 다음 그림과 같이 나와야 합니다. 
+![Alt text](./img/1.PNG)
