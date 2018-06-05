@@ -11,7 +11,7 @@
 
 이전문서에서는 validator 2개를 로컬환경에서 연결하는 작업을 했었음. 이번 문서의 작업을 제대로 이해하기 위해서는 이전문서를 꼭 읽어보고 오시기 바랍니당
 
-먼저 [제네시스블럭을 생성하는 YAML]()과 [기타 validator의 YAML]()을 다운로드 받아주세요
+먼저 [제네시스블럭을 생성하는 YAML](https://github.com/GRuuuuu/Learning_Sawtooth/blob/master/sawtooth/sawtooth%20running%20%236/genesis/sawtooth-default-poet.yaml)과 [기타 validator의 YAML](https://github.com/GRuuuuu/Learning_Sawtooth/tree/master/sawtooth/sawtooth%20running%20%236/validator)을 다운로드 받아주세요
 
 >이 문서는 포트를 다루고 있기 때문에 로컬환경에서 작업하던 이전 문서와 달리 예상치못한 네트워크 관련 문제가 (매우)많이 생길 수 있습니다.  
 실제로 매우매우매우 고생했기 때문에...몇가지 해결방법을 미리 기술합니다.
@@ -25,63 +25,62 @@
 
 ## 3. 일단 실행
 
-다운로드받은 yaml파일이 있는 폴더로 이동해서 shell(이하 shell-1)에서 다음 커맨드를 쳐봅시다
+>genesis block이 있는 컴퓨터를 com-1, 기타 validator가 있는 컴퓨터를 com-2로 하겠습니다.
+
+com-1과 com-2에서 다운받은 yaml파일을 실행해봅시다. genesis block을 생성하는 com-1에서 먼저 실행하고 그다음 com-2의 yaml파일을 실행해봅시다.
 ~~~
 docker-compose -f sawtooth-default-poet.yaml up
 ~~~
-yaml파일에 미리 기록해두었던 이미지들이 실행될겁니다. 정상적으로 실행된다면 다음과같은 화면이 보일거에요. 
+yaml파일에 미리 기록해두었던 이미지들이 실행될겁니다. 
 
-![Alt text](./img/1.PNG)
+com-1에서 실행한 결과:
+![Alt text](./img/1.png)
+yaml파일에 기술되어있던 이미지들이 handler에 의해 validator에 붙게되고 chain heead를 생성한 뒤, 블럭의 top을 쌓게 됩니다. 그리고 다른 peer나 트랜잭션이 올 때까지 대기하게 됩니다.
 
-### 연결확인
-
-지금 켜져있는 shell-1을 끄지말고(로그 확인용) 하나 더켜서(이하 shell-2) bash를 실행
-~~~
-docker exec -it sawtooth-shell-default bash
-~~~
-
-`curl`커맨드로 peer가 제대로 연결되었는지 확인해봅시다.
-~~~
-curl http://sawtooth-rest-api-default-0:8008/peers
-~~~
-
-data에 validator-1이 존재하는 것을 확인할 수 있습니다.  
-이는 validator-0(제네시스 블럭)과 validator-1이 연결되어 있다는 의미입니다.
-
+com-1의 ip:8008/blocks를 주소창에 쳐보면 블럭이 생성된 모습을 확인할 수 있습니다.
 ![Alt text](./img/2.PNG)
 
-
-### xo게임 실행
-
-두개의 validator 실행에 성공하였다면 xo게임생성을 통해 블럭이 쌓이는 모습을 확인해보겠습니다.
-~~~
-이전 문서를 참고해서 키 만들고 xo게임생성 ㄱㄱ
-xo create example --username a --url http://rest-api-0:8008
-~~~
->이전 문서에서는 단순히 rest-api:8008만 했지만 yaml 파일을 생성할때 validator0번의 rest-api가 rest-api-0으로 명명되었으므로 이렇게 작성해 주어야함 
-
-실행하게되면 shell-2에는 Response가 오게될 것
+com-2에서 실행한 결과(비정상):
 ![Alt text](./img/3.PNG)
+이 뒤로 아무것도 뜨지 않는다면 제대로 연결되지 않았음을 의미합니다.  
+원인은 3가지정도가 있는데,  
+1. 연결하려는 validator의 ip가 정확하지 않다.
+2. 연결하고자하는 컴퓨터의 포트나 내 컴퓨터의 포트가 제대로 열려있지 않다.
+3. 연결하고자하는 validator의 준비가 되지 않았다.  
+이 경우는 com-2를 먼저 실행하고 com-1을 나중에 실행하는 경우가 되겠네요.
 
-이전에 띄워놓았던 shell-1을 확인해보면 validator 1개를 쓸 때보다 많은양의 로그가 기록되어있는것을 확인할 수 있음. 두개의 validator 모두 검증작업을 진행하기 때문이다.  
->로그의 내용은 따로 설명하지 않을 것. 읽으면 자연스레 알게되는 내용★
-
-두개의 validator 모두 게임이 정상적으로 생성된 것을 확인할 수 있음!
-
+제대로 연결되지 않는다면 블럭이 제대로 생성되지 않아,  
+com-2 ip:8008/blocks 을 주소에 쳤을 경우 이런 화면이 뜨게 됩니다.
 ![Alt text](./img/4.PNG)
+
+com-2에서 실행한 결과(정상):
+![Alt text](./img/5.PNG)
+위의 결과이후에 block을 building하기 시작합니다. 이러면 com-1과 연결이 성공했음을 알 수 있습니다.  
+
+com-1의 화면을 잠깐 보면
+![Alt text](./img/6.PNG)
+같은 화면처럼 보이겠지만 두 사진은 서로 다른 네트워크에서 작업한 것입니다. 빨간 밑줄을 친 부분을 보면 block의 검증을 진행하고 검증이 완료되면 블럭을 업데이트하는 모습을 볼 수 있습니다.
+
+그럼 이제 com-2 ip:8008/blocks 을 주소에 쳐보겠습니다.
+![Alt text](./img/7.PNG)
+블럭의 길이가 1 증가된 모습을 확인할 수 있습니다. com-1의 blocks도 확인해보면 똑같은 블럭을 갖고 있는 모습을 확인할 수 있습니다.
+
+
 
 ## 4. YAML파일 뜯어보기
 
 ### validator
-
+기본적으로 이전문서의 yaml구성과 비슷합니다. 하지만 정확한 ip를 명시해줘야 한다는 점을 잊으면 안됩니다.
 ~~~
-  validator-0:                                      //제네시스 블럭
-    image: hyperledger/sawtooth-validator:1.0       //이미지 이름
-    container_name: sawtooth-validator-default-0    //컨테이너 이름
-    expose:                                         //사용할 포트
+  validator-0:                                       //com-1의 validator(genesis)
+    image: hyperledger/sawtooth-validator:1.0
+    container_name: sawtooth-validator-default-0
+    expose:
       - 4004
       - 8800
-    command: "bash -c \"\                           //제네시스블럭을 생성
+    ports:
+      - "8800:8800"
+    command: "bash -c \"\
         sawadm keygen --force && \
         sawset genesis \
           -k /etc/sawtooth/keys/validator.priv \
@@ -103,35 +102,36 @@ xo create example --username a --url http://rest-api-0:8008
           -o poet-settings.batch && \
         sawadm genesis \
           config-genesis.batch config.batch poet.batch poet-settings.batch && \
-        sawtooth-validator -v \                    //validator 설정
-          --bind network:tcp://eth0:8800 \         //bind : 포트를 고정시킴
+        sawtooth-validator -v \
+          --bind network:tcp://eth0:8800 \
           --bind component:tcp://eth0:4004 \
-          --peering dynamic \                      //동적으로 peer를 붙임
-          --endpoint tcp://validator-0:8800 \      //작업이 실제로 수행되는 지점
-          --scheduler serial \                     //스케줄링은 serial하게(병렬도 있음)
-          --network trust                          //신뢰하는 네트워크만
+          --peering dynamic \
+          --endpoint tcp://210.94.194.82:8800         //com-1의 ip주소
     \""
-    environment:                                   //환경변수
+    environment:
       PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
         /project/sawtooth-core/consensus/poet/simulator:\
         /project/sawtooth-core/consensus/poet/core"
-    stop_signal: SIGKILL                          //종료는 ctrl+c
-
-  validator-1:                                    //제네시스 블럭에 붙을 1번노드   
-    image: hyperledger/sawtooth-validator:1.0 
+    stop_signal: SIGKILL
+ ~~~
+ ~~~   
+  validator-1:                                        //com-2의 validator
+    image: hyperledger/sawtooth-validator:1.0
     container_name: sawtooth-validator-default-1
     expose:
       - 4004
       - 8800
-    command: |                                    //제네시스 블럭과 달리 블럭을  
-      bash -c "                                   //생성할 필요가 없음!!!
+    ports:
+      - "8800:8800"
+    command: |
+      bash -c "
         sawadm keygen --force && \
         sawtooth-validator -v \
             --bind network:tcp://eth0:8800 \
             --bind component:tcp://eth0:4004 \
             --peering dynamic \
-            --endpoint tcp://validator-1:8800 \
-            --seeds tcp://validator-0:8800 \      //붙을 노드의 ip(로컬에서는 이름)
+            --endpoint tcp://--.--.--.--:8800 \      //com-2의 ip주소
+            --seeds tcp://--.--.--.--:8800 \        //com-1의 ip주소
             --scheduler serial \
             --network trust
       "
@@ -141,59 +141,11 @@ xo create example --username a --url http://rest-api-0:8008
         /project/sawtooth-core/consensus/poet/core"
     stop_signal: SIGKILL
 ~~~
-
-### rest-api외 다른 이미지들
-~~~
-  rest-api-0:                                      //validator에 붙일 이미지의 이름
-    image: hyperledger/sawtooth-rest-api:1.0
-    container_name: sawtooth-rest-api-default-0
-    expose:
-      - 4004
-      - 8008
-    command: |
-      bash -c "
-        sawtooth-rest-api \
-          --connect tcp://validator-0:4004 \      //반드시 해당 블럭의 validator에 connect
-          --bind rest-api-0:8008"
-    stop_signal: SIGKILL
-
-  rest-api-1:
-    image: hyperledger/sawtooth-rest-api:1.0
-    container_name: sawtooth-rest-api-default-1
-    expose:
-      - 4004
-      - 8008
-    command: |
-      bash -c "
-        sawtooth-rest-api \
-          --connect tcp://validator-1:4004 \
-          --bind rest-api-1:8008"
-    stop_signal: SIGKILL
-    
-    ...
-
-  xo-tp-0:
-    image: hyperledger/sawtooth-xo-tp-python:1.0
-    container_name: sawtooth-xo-tp-python-default-0
-    expose:
-      - 4004
-    command: xo-tp-python -vv -C tcp://validator-0:4004
-    stop_signal: SIGKILL
-
-  xo-tp-1:
-    image: hyperledger/sawtooth-xo-tp-python:1.0
-    container_name: sawtooth-xo-tp-python-default-1
-    expose:
-      - 4004
-    command: xo-tp-python -vv -C tcp://validator-1:4004
-    stop_signal: SIGKILL
-   
-    //나머지 이미지들도 비슷
-~~~
+얘네 외에는 똑같음. endpoint에 주의!
 
 ## 5. 마치며
 
-여러개의 validator를 로컬 서버안에서 다뤄보는 작업을 하였고, 다음 문서에서는 서로 다른 네트워크상에서 validator를 이어보는 작업을 해볼것
+validator를 서로다른 네트워크 안에서 이어보는 작업을 하였고, 다음 문서에서는 커스텀이미지(processor)를 구축한 뒤, 실제로 validator에 붙여보는 작업을 할 것!
 
 ---
 
