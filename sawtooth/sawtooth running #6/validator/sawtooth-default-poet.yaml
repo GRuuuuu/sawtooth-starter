@@ -1,0 +1,109 @@
+# Copyright 2018 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ------------------------------------------------------------------------------
+
+version: "2.1"
+
+services:
+  shell:
+    image: hyperledger/sawtooth-all:1.0
+    container_name: sawtooth-shell-default
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  validator-1:
+    image: hyperledger/sawtooth-validator:1.0
+    container_name: sawtooth-validator-default-1
+    expose:
+      - 4004
+      - 8800
+    ports:
+      - "8800:8800"
+    command: |
+      bash -c "
+        sawadm keygen --force && \
+        sawtooth-validator -v \
+            --bind network:tcp://eth0:8800 \
+            --bind component:tcp://eth0:4004 \
+            --peering dynamic \
+            --endpoint tcp://192.168.55.7:8800 \
+            --seeds tcp://210.94.194.82:8800 \
+            --scheduler serial \
+            --network trust
+      "
+    environment:
+      PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
+        /project/sawtooth-core/consensus/poet/simulator:\
+        /project/sawtooth-core/consensus/poet/core"
+    stop_signal: SIGKILL
+
+  
+  rest-api-1:
+    image: hyperledger/sawtooth-rest-api:1.0
+    container_name: sawtooth-rest-api-default-0
+    expose:
+      - 4004
+      - 8008
+    ports:
+      - "8008:8008"
+    command: |
+      bash -c "
+        sawtooth-rest-api \
+          -C tcp://validator-1:4004 \
+          --bind rest-api-1:8008"
+    stop_signal: SIGKILL
+
+
+  intkey-tp-1:
+    image: hyperledger/sawtooth-intkey-tp-python:1.0
+    container_name: sawtooth-intkey-tp-python-default-0
+    expose:
+      - 4004
+    command: intkey-tp-python -C tcp://validator-1:4004
+    stop_signal: SIGKILL
+
+ 
+  xo-tp-1:
+    image: hyperledger/sawtooth-xo-tp-python:1.0
+    container_name: sawtooth-xo-tp-python-default-0
+    expose:
+      - 4004
+    command: xo-tp-python -vv -C tcp://validator-1:4004
+    stop_signal: SIGKILL
+
+
+
+  settings-tp-1:
+    image: hyperledger/sawtooth-settings-tp:1.0
+    container_name: sawtooth-settings-tp-default-0
+    expose:
+      - 4004
+    command: settings-tp -C tcp://validator-1:4004
+    stop_signal: SIGKILL
+
+
+
+  poet-validator-registry-tp-1:
+    image: hyperledger/sawtooth-poet-validator-registry-tp:1.0
+    container_name: sawtooth-poet-validator-registry-tp-0
+    expose:
+      - 4004
+    command: poet-validator-registry-tp -C tcp://validator-1:4004
+    environment:
+      PYTHONPATH: /project/sawtooth-core/consensus/poet/common
+    stop_signal: SIGKILL
+
+  
