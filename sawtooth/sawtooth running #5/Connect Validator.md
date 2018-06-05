@@ -12,175 +12,182 @@
 공식 doc에서는 validator를 4개를 사용하여 연결되는 것을 보여주고있습니다.  
 --> [참고링크](https://sawtooth.hyperledger.org/docs/core/nightly/master/app_developers_guide/sawtooth-default-poet.yaml)
 
-이 문서에서는 보다 간편하게 설명하기 위해서 validator 2개만 가지고 설명할것임.
+이 문서에서는 보다 간편하게 설명하기 위해서 validator 2개만 가지고 설명할것임.  
+우선 [요걸](https://github.com/GRuuuuu/Learning_Sawtooth/blob/master/sawtooth/sawtooth%20running%20%235/sawtooth-default-poet.yaml) 다운로드 받아주세요
 
-## 3. 소스코드 뜯
+## 3. 일단 실행
 
-### XoTransactionProcessor.java
-
-프로그램의 시작점입니다.
-~~~java
-public class XoTransactionProcessor {
-  /**
-   * TransactionProcessor가 들어있는 Thread를 실행
-   */
-  public static void main(String[] args) {
-    /*
-    * args[0]에 들어가야할 것 
-    * tcp://validator의ip또는 docker의 ip:4004
-    */
-    TransactionProcessor transactionProcessor = new TransactionProcessor(args[0]);
-    transactionProcessor.addHandler(new XoHandler());
-    Thread thread = new Thread(transactionProcessor);
-    thread.start();
-  }
-}
+다운로드받은 yaml파일이 있는 폴더로 이동해서 shell(이하 shell-1)에서 다음 커맨드를 쳐봅시다
 ~~~
-`TransactionProcessor`에서는 validator의 ip나 docker의 ip를 받아 포트 4004로 sawtooth와 연결.  
-핸들러로 XoHandler를 추가, 그다음 thread로 실행시킵니다.  
+docker-compose -f sawtooth-default-poet.yaml up
+~~~
+yaml파일에 미리 기록해두었던 이미지들이 실행될겁니다. 정상적으로 실행된다면 다음과같은 화면이 보일거에요. 
 
-### XoHandler.java
+![Alt text](./img/1.PNG)
 
-`TransactionHandler`를 implements하여 API를 오버라이드하여 다양한 메소드를 활용할 수 있습니다.
+### 연결확인
 
-~~~java
-- XoHandler
- public XoHandler() {
-    try {
-      this.xoNameSpace = Utils.hash512(
-        this.transactionFamilyName().getBytes("UTF-8")).substring(0, 6);
-    } catch (UnsupportedEncodingException usee) {
-      usee.printStackTrace();
-      this.xoNameSpace = "";
-    }
-  }
+지금 켜져있는 shell-1을 끄지말고(로그 확인용) 하나 더켜서(이하 shell-2) bash를 실행
+~~~
+docker exec -it sawtooth-shell-default bash
+~~~
 
-  @Override
-  public String transactionFamilyName() {
-      /*transaction의 family name을 리턴*/
-    return "xo";
-  }
+`curl`커맨드로 peer가 제대로 연결되었는지 확인해봅시다.
+~~~
+curl http://sawtooth-rest-api-default-0:8008/peers
+~~~
 
-  @Override
-  public String getVersion() {
-      /*현재 버전 리턴*/
-    return "1.0";
-  }
+data에 validator-1이 존재하는 것을 확인할 수 있습니다.  
+이는 validator-0(제네시스 블럭)과 validator-1이 연결되어 있다는 의미입니다.
 
-  @Override
-  public Collection<String> getNameSpaces() {
-    ArrayList<String> namespaces = new ArrayList<>();
-    namespaces.add(this.xoNameSpace);
-    return namespaces;
-  }
+![Alt text](./img/2.PNG)
+
+
+### xo게임 실행
+
+두개의 validator 실행에 성공하였다면 xo게임생성을 통해 블럭이 쌓이는 모습을 확인해보겠습니다.
+~~~
+이전 문서를 참고해서 키 만들고 xo게임생성 ㄱㄱ
+xo create example --username a --url http://rest-api-0:8008
+~~~
+>이전 문서에서는 단순히 rest-api:8008만 했지만 yaml 파일을 생성할때 validator0번의 rest-api가 rest-api-0으로 명명되었으므로 이렇게 작성해 주어야함 
+
+실행하게되면 shell-2에는 Response가 오게될 것
+![Alt text](./img/3.PNG)
+
+이전에 띄워놓았던 shell-1을 확인해보면 validator 1개를 쓸 때보다 많은양의 로그가 기록되어있는것을 확인할 수 있음. 두개의 validator 모두 검증작업을 진행하기 때문이다.  
+>로그의 내용은 따로 설명하지 않을 것. 읽으면 자연스레 알게되는 내용★
+
+두개의 validator 모두 게임이 정상적으로 생성된 것을 확인할 수 있음!
+
+![Alt text](./img/4.PNG)
+
+## 4. YAML파일 뜯어보기
+
+### validator
 
 ~~~
+  validator-0:                                      //제네시스 블럭
+    image: hyperledger/sawtooth-validator:1.0       //이미지 이름
+    container_name: sawtooth-validator-default-0    //컨테이너 이름
+    expose:                                         //사용할 포트
+      - 4004
+      - 8800
+    command: "bash -c \"\                           //제네시스블럭을 생성
+        sawadm keygen --force && \
+        sawset genesis \
+          -k /etc/sawtooth/keys/validator.priv \
+          -o config-genesis.batch && \
+        sawset proposal create \
+          -k /etc/sawtooth/keys/validator.priv \
+          sawtooth.consensus.algorithm=poet \
+          sawtooth.poet.report_public_key_pem=\
+          \\\"$$(cat /etc/sawtooth/simulator_rk_pub.pem)\\\" \
+          sawtooth.poet.valid_enclave_measurements=$$(poet enclave measurement) \
+          sawtooth.poet.valid_enclave_basenames=$$(poet enclave basename) \
+          -o config.batch && \
+        poet registration create -k /etc/sawtooth/keys/validator.priv -o poet.batch && \
+        sawset proposal create \
+          -k /etc/sawtooth/keys/validator.priv \
+             sawtooth.poet.target_wait_time=5 \
+             sawtooth.poet.initial_wait_time=25 \
+             sawtooth.publisher.max_batches_per_block=100 \
+          -o poet-settings.batch && \
+        sawadm genesis \
+          config-genesis.batch config.batch poet.batch poet-settings.batch && \
+        sawtooth-validator -v \                    //validator 설정
+          --bind network:tcp://eth0:8800 \         //bind : 포트를 고정시킴
+          --bind component:tcp://eth0:4004 \
+          --peering dynamic \                      //동적으로 peer를 붙임
+          --endpoint tcp://validator-0:8800 \      //작업이 실제로 수행되는 지점
+          --scheduler serial \                     //스케줄링은 serial하게(병렬도 있음)
+          --network trust                          //신뢰하는 네트워크만
+    \""
+    environment:                                   //환경변수
+      PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
+        /project/sawtooth-core/consensus/poet/simulator:\
+        /project/sawtooth-core/consensus/poet/core"
+    stop_signal: SIGKILL                          //종료는 ctrl+c
+
+  validator-1:                                    //제네시스 블럭에 붙을 1번노드   
+    image: hyperledger/sawtooth-validator:1.0 
+    container_name: sawtooth-validator-default-1
+    expose:
+      - 4004
+      - 8800
+    command: |                                    //제네시스 블럭과 달리 블럭을  
+      bash -c "                                   //생성할 필요가 없음!!!
+        sawadm keygen --force && \
+        sawtooth-validator -v \
+            --bind network:tcp://eth0:8800 \
+            --bind component:tcp://eth0:4004 \
+            --peering dynamic \
+            --endpoint tcp://validator-1:8800 \
+            --seeds tcp://validator-0:8800 \      //붙을 노드의 ip(로컬에서는 이름)
+            --scheduler serial \
+            --network trust
+      "
+    environment:
+      PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
+        /project/sawtooth-core/consensus/poet/simulator:\
+        /project/sawtooth-core/consensus/poet/core"
+    stop_signal: SIGKILL
+~~~
+
+### rest-api외 다른 이미지들
+~~~
+  rest-api-0:                                      //validator에 붙일 이미지의 이름
+    image: hyperledger/sawtooth-rest-api:1.0
+    container_name: sawtooth-rest-api-default-0
+    expose:
+      - 4004
+      - 8008
+    command: |
+      bash -c "
+        sawtooth-rest-api \
+          --connect tcp://validator-0:4004 \      //반드시 해당 블럭의 validator에 connect
+          --bind rest-api-0:8008"
+    stop_signal: SIGKILL
+
+  rest-api-1:
+    image: hyperledger/sawtooth-rest-api:1.0
+    container_name: sawtooth-rest-api-default-1
+    expose:
+      - 4004
+      - 8008
+    command: |
+      bash -c "
+        sawtooth-rest-api \
+          --connect tcp://validator-1:4004 \
+          --bind rest-api-1:8008"
+    stop_signal: SIGKILL
+    
+    ...
+
+  xo-tp-0:
+    image: hyperledger/sawtooth-xo-tp-python:1.0
+    container_name: sawtooth-xo-tp-python-default-0
+    expose:
+      - 4004
+    command: xo-tp-python -vv -C tcp://validator-0:4004
+    stop_signal: SIGKILL
+
+  xo-tp-1:
+    image: hyperledger/sawtooth-xo-tp-python:1.0
+    container_name: sawtooth-xo-tp-python-default-1
+    expose:
+      - 4004
+    command: xo-tp-python -vv -C tcp://validator-1:4004
+    stop_signal: SIGKILL
+   
+    //나머지 이미지들도 비슷
+~~~
+
+## 5. 마치며
+
+여러개의 validator를 로컬 서버안에서 다뤄보는 작업을 하였고, 다음 문서에서는 서로 다른 네트워크상에서 validator를 이어보는 작업을 해볼것
 
 ---
-
-사용할 TransactionData와 GameData를 구성
-~~~java
-  class TransactionData {
-    final String gameName;
-    final String action;
-    final String space;
-
-    TransactionData(String gameName, String action, String space) {
-      this.gameName = gameName;
-      this.action = action;
-      this.space = space;
-    }
-  }
-
-  class GameData {
-    final String gameName;
-    final String board;
-    final String state;
-    final String playerOne;
-    final String playerTwo;
-
-    GameData(String gameName, String board, String state, String playerOne, String playerTwo) {
-      this.gameName = gameName;
-      this.board = board;
-      this.state = state;
-      this.playerOne = playerOne;
-      this.playerTwo = playerTwo;
-    }
-  }
-~~~
-
----
-
-~~~java
-  - apply메소드
-  /*
-  * apply메소드는 두개의 argument를 받습니다.
-  * transactionRequest : 실행된 커맨드를 받습니다. (예: take space, create game)
-  * stateStore : 게임의 현재상태를 저장한 상태정보
-  * */
-  @Override
-  public void apply(TpProcessRequest transactionRequest, State stateStore)
-      throws InvalidTransactionException, InternalError {
-
-    //리퀘스트 데이터를 unpack해서 transactionData에 저장
-    TransactionData transactionData = getUnpackedTransaction(transactionRequest);
-
-    // transaction의 서명자는 플레이어
-    String player;
-    TransactionHeader header = transactionRequest.getHeader();
-    player = header.getSignerPublicKey();
-
-    /*이 밑으로는 처음 트랜잭션을 받았을 때 처리해야할 exception들을 정의해둠*/
-    if (transactionData.gameName.equals("")) { //게임이름이 빠진경우
-      throw new InvalidTransactionException("Name is required");
-    }
-    if (transactionData.gameName.contains("|")) {//게임이름의 특수경우
-      throw new InvalidTransactionException("Game name cannot contain '|'");
-    }
-    if (transactionData.action.equals("")) {//액션이빠짐
-      throw new InvalidTransactionException("Action is required");
-    }
-    if (transactionData.action.equals("take")) {//take 커맨드 사용
-      try {
-        int space = Integer.parseInt(transactionData.space); //마킹할 장소(space)
-
-        if (space < 1 || space > 9) {//마킹할 장소는 1~9사이여야함
-          throw new InvalidTransactionException(
-              String.format("Invalid space: %s", transactionData.space));
-        }
-      } catch (NumberFormatException e) {
-        throw new InvalidTransactionException("Space could not be converted to an integer.");
-      }
-    }
-    /*커맨드가 take와 create가 아닌 경우*/
-    if (!transactionData.action.equals("take") && !transactionData.action.equals("create")) {
-      throw new InvalidTransactionException(
-          String.format("Invalid action: %s", transactionData.action));
-    }
-
-    String address = makeGameAddress(transactionData.gameName);
-    // stateStore.get() returns a list.
-    // If no data has been stored yet at the given address, it will be empty.
-    // 현재상태의 주소값을 가져옴. singletonList: 생성후 변경불가능한객체
-    String stateEntry = stateStore
-            .getState(Collections.singletonList(address))//만든 게임의 상태
-            .get(address) //그 상태의 주소
-            .toStringUtf8();
-    
-    //현재 게임의 상태를 stateData에 저장
-    GameData stateData = getStateData(stateEntry, transactionData.gameName);
-    
-    //상태데이터와 커맨드데이터, 누가(주체)플레이중인지 로 업데이트된 게임데이터
-    GameData updatedGameData = playXo(transactionData, stateData, player);
-    
-    //저-장 (게임의주소, 업데이트된 게임데이터, 현재게임상태 주소, 현재게임상태)
-    storeGameData(address, updatedGameData, stateEntry, stateStore);
-  }
-~~~
-
----
-
-나머지 메소드는 생략
 
 ---
 
