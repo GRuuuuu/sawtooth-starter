@@ -106,7 +106,7 @@ com-1의 화면을 잠깐 보면
           --bind network:tcp://eth0:8800 \
           --bind component:tcp://eth0:4004 \
           --peering dynamic \
-          --endpoint tcp://210.94.194.82:8800         //com-1의 ip주소
+          --endpoint tcp://--.--.--.--:8800         //com-1의 ip주소
     \""
     environment:
       PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
