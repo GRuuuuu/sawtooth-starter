@@ -11,7 +11,7 @@
 
 이전문서에서는 validator들을 서로 다른 네트워크에서 이어보는 작업을 진행했습니다. 이번 문서의 작업을 제대로 이해하기 위해서는 이전문서를 꼭 읽어보고 오시기 바랍니당
 
-먼저 [NEWxo.jar](https://github.com/GRuuuuu/Learning_Sawtooth/blob/master/sawtooth/sawtooth%20running%20%236/genesis/sawtooth-default-poet.yaml)와 [Dockerfile]()그리고 [YAML파일]()을 다운로드 받아주세요
+먼저 [NEWxo.jar](https://github.com/GRuuuuu/Learning_Sawtooth/tree/master/sawtooth/sawtooth%20running%20%237)와 [Dockerfile](https://github.com/GRuuuuu/Learning_Sawtooth/blob/master/sawtooth/sawtooth%20running%20%237/Dockerfile)그리고 [YAML파일](https://github.com/GRuuuuu/Learning_Sawtooth/blob/master/sawtooth/sawtooth%20running%20%237/sawtooth-default-poet.yaml)을 다운로드 받아주세요
 
 
 ## 3. 일단 실행
@@ -68,7 +68,7 @@ command부분과 형식이 같습니다.
       - "4004:4004"
     stop_signal: SIGKILL
 ~~~
-얘네 외에는 똑같음.
+외에는 똑같음.
 
 ## 5. 마치며
 
