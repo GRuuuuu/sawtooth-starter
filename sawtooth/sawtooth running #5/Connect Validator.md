@@ -1,6 +1,6 @@
 유징 소투스 윗 도커 뽀 윈도우
 ====
-`이 문서는 hyperledger sawtooth 1.0을 docker for windows(18.03.01-ce-win65)에서 다루며 os는 window 10 pro임`
+`이 문서는 hyperledger sawtooth 1.0.4을 docker for windows(18.03.01-ce-win65)에서 다루며 os는 window 10 pro임`
 
 # 5. Connect multi validator in local server
 
