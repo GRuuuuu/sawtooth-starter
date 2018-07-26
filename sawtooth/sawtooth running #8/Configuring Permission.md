@@ -1,4 +1,4 @@
-유징 소투스 윗 도커 뽀 윈도우
+유징 소투스 윗 도커 뽀 우분뚜
 ====
 `이 문서는 hyperledger sawtooth 1.0.4을 docker for ubuntu(18.03.01-ce)에서 다루며 os는 ubuntu-18.04 LTS임`
 
