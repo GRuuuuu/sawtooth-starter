@@ -2,7 +2,7 @@
 ====
 `이 문서는 hyperledger sawtooth 1.0.4을 docker for windows(18.03.01-ce-win65)에서 다루며 os는 window 10 pro임`
 
-# 7. Make Costom Processor and Connect to Validator
+# 7. Make Custom Processor and Connect to Validator
 
 ## 1. Overview
 이번 문서에서는 커스텀 프로세서를 만들어 validator에 연결해보도록 하겠습니다. 빠른 진행을 위해 xo게임을 수정해서 붙여보겠습니다.
