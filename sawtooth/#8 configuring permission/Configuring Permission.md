@@ -2,7 +2,7 @@
 ====
 `이 문서는 hyperledger sawtooth 1.0.4을 docker for ubuntu(18.03.01-ce)에서 다루며 os는 ubuntu-18.04 LTS임`
 
-# 8. Configuring Permission (for Transactor)
+# 8. Configuring Permission 
 
 ## 1. Overview
 이번 문서에서는 Transaction과 Batch의 권한 생성 및 설정에 대해서 다뤄보겠습니다.
@@ -68,7 +68,7 @@ docker-compose up
 ~~~
 >docker-compose에 따로 파일이름을 기재하지 않는 이유는 파일이름이 `docker-compose.yaml`이기 때문입니다. 만약 파일이름이 `a.yaml`이라면 
 >~~~
->docker-compose a.yaml up 
+>docker-compose -f a.yaml up 
 >~~~
 >위와 같이 나오겠죠.
 
@@ -210,9 +210,20 @@ sawtooth identity role list --url http://rest-api:8008
 ![Alt text](./img/7.PNG)
 하지만 a의 트랜잭션만 거절되고 나머지 b와 c는 제대로 트랜잭션이 들어간 것을 확인할 수 있습니다.
 
-참으로 요상한 소투스
 
->Validator의 role은 추후 업데이트 예정
+
+---
+
+
+현재 `sawtooth`에서 설정할 수 있는 Validator의 role은 2개로 다음과 같습니다.
+
+>network:  
+>peer를 붙이는(현재 validator에 붙으려는 요청)요청이 올 때, 그 요청을 보내는 public key가 policy에 의하여 거절되었다면 이 요청은 거절되고 `AuthorizationViolation` 메세지가 리턴되고 커넥션은 끊어지게 됩니다.
+>  
+>network.consensus:  
+>validator가 새로운 블록을 만들자는 GossipMessage를 받았을 때, 그 요청을 보내는 public key가 policy에 의해 거절되었다면 요청거절->`AuthorizationViolation` 메세지가 리턴되고 커넥션 종료
+>  
+>
 
 
 
