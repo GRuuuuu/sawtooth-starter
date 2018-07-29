@@ -220,7 +220,7 @@ CBOR을 사용하지 않고, protocol buffer의 encode를 사용하고 있습니
 
 input과 output에 관한 정보는 [여기](https://github.com/hyperledger/sawtooth-core/blob/master/cli/sawtooth_cli/identity.py)의 line 49처럼 define된 변수가 있거나 공식문서의 트랜잭션패밀리를 다룬 [부분](https://sawtooth.hyperledger.org/docs/core/nightly/master/transaction_family_specifications/identity_transaction_family.html)의 Addressing을 확인하면 됩니다.
 
-![Alt text](./img/3.PNG)  
+![Alt text](./img/3.png)  
 만약 input과 output을 틀리게 적었다면 위와같은 오류가 발생합니다.
 
 이 뒤의 내용은 공식문서의 예시와 같으니 참고하시면 됩니다.  
