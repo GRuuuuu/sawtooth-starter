@@ -1,15 +1,15 @@
 Journal
 ====
 
->원문 : [Journal](https://sawtooth.hyperledger.org/docs/core/nightly/master/architecture/journal.html)
+>원문 : [Journal](https://sawtooth.hyperledger.org/docs/core/nightly/master/architecture/journal.html)  
 >sawtooth 1.0.5
 
-journal은 batch들과 제안된 블록들을 다루기 위한 validator component들의 그룹입니다. 이런 컴포넌트들은 블럭을 생성하고, 체인을 확장하기 위한 batch들 그리고 제안된 블록이 새로운 체인 헤드를 생성해도 좋은지에 대한 검증에 대한 책임이 있습니다.  
+journal은 batch들과 제안된 블록들을 다루기 위한 validator component들의 그룹입니다. 이런 컴포넌트들은 블럭을 생성하고, 체인을 확장하기 위한 batch들 그리고 제안된 블록이 새로운 체인 헤드를 생성해도 좋은지에 대한 검증을 합니다.  
 
 블럭과 batch들은 gossip프로토콜이나 클라이언트의 request를 통해 상호연결됩니다. 이러한 과정은 다중 pipeline을 통해 다뤄집니다.  
 
-![Alt text](./img/1.PNG)
 
+<img width="600" height="560" src="./img/1.PNG"></img>
 * `Completer`는 블록과 batch들을 가장 먼저 받게 됩니다. 블록과 batch들을 위한 모든 의존성이 만족하는지를 보장합니다.
 * Completer를 통해 나온 batch들은(Completed batches) batch 검증과 블록에 포함시키기 위해 `BlockPublisher`로 가게됩니다.
 * Completer를 통해 나온 block들은(Completed blocks) 검증과 fork문제 해결을 위해 `ChainController`로 가게 됩니다.
@@ -36,7 +36,7 @@ Completer는 먼저 이전블록이 존재하는지 의존성을 체크하고 �
 
 # The BlockPublisher
 
-BlockPublisher는 체인을 확장하기 위해 후보 블록을 생성하는 책임을 가지고 있습니다. BlockPublisher는 블록을 만드는데있어 모든 살림을 맡아서 처리하지만, 언제 블록을 생성하고 언제 발행할지는 합의 알고리즘의 지시를 따릅니다.  
+BlockPublisher는 체인을 확장하기 위해 후보 블록을 생성합니다. BlockPublisher는 블록을 만드는데있어 모든 살림을 맡아서 처리하지만, 언제 블록을 생성하고 언제 발행할지는 합의 알고리즘의 지시를 따릅니다.  
 
 BlockPublisher는 다음과 같은 이벤트에 반응합니다.
 * Start block
@@ -46,7 +46,7 @@ BlockPublisher는 다음과 같은 이벤트에 반응합니다.
 
 # The ChainController
 
-ChainController는 blockchain을 유지하는 책임을 지니고 있습니다. 제안된 블록을 검증하는 작업, 유효한 블록인지를 결정하는 작업, 체인을 확장하는 새로운 블록 생성에 관한 작업을 담당합니다.  
+ChainController는 blockchain을 유지합니다. 제안된 블록을 검증하는 작업, 유효한 블록인지를 결정하는 작업, 체인을 확장하는 새로운 블록 생성에 관한 작업을 담당합니다.  
 
 ChainController는 어떤 체인이 현재 validator에 속해있는지, 체인의 변경이 필요한 활동을 조정하게 됩니다.  
 
