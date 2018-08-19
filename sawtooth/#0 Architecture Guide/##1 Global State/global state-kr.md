@@ -19,16 +19,18 @@ sawtooth는 머클트리를 트랜잭션 패밀리의 데이터를 저장하는�
 >상태루트의 해시값은 모든 데이터와 자식 해시들이 가리키는 모든 노드들의 누적값입니다. 그래서 만약 트리 안에서 데이터의 변경이 발생하면 연관된 모든 해시값들이 변경되게 됩니다.  
 
 ## Radix Addresses
-![Alt text](https://sawtooth.hyperledger.org/docs/core/nightly/master/_images/state_address_format.svg)
+![Alt text](https://sawtooth.hyperledger.org/docs/core/nightly/master/_images/state_address_format.svg)  
 Radix트리는 트리의 리프노드에 대한 경로를 고유하게 식별할 수 있습니다. 주소는 hex인코딩된 70개의 문자로 나타나집니다. 길이는 35bytes(Namespace prefix: 3bytes, Namespace-specific: 32bytes). 각 바이트는 주소와 연관된 데이터가 들어있는 리프 경로의 다음 노드를 식별하는 Radix path입니다. 주소는 앞 3bytes(6 hex characters)를 namespace의 prefix로 사용합니다. sawtooth에서는 2^24(16,777,216)개의 서로다른 namespace를 사용할 수 있습니다. 남은 32bytes(64 hex characters)는 namespace를 디자인한 사람이 정의한 인코딩방식으로 인코딩됩니다. 그리고 추가적으로 object 타입을 구별하고 도메인 별 고유 식별자를 주소에 매핑하는것들이 추가될 수 있습니다. 더 자세한 설명은 Wikipedia의 [Radix](https://en.wikipedia.org/wiki/Radix_tree)를 참조!
 
 ![Alt text](https://sawtooth.hyperledger.org/docs/core/nightly/master/_images/state_radix.svg)
 
->간단한 머클트리 설명 ->  
+>### 간단한 머클트리 설명:
+>  
 >블록의 헤더는
 > 1. previous 블록의 해시값(연결되어있음을 나타냄) 
 > 2. nonce값
 > 3. 머클 루트 (Merkle Root)  
+>
 >로 구성되어있으며 머클 루트는 해당 블록의 모든 거래내역을 요약한 작은 사이즈의 용량의 데이터를 담고있다.  
 >머클 트리는 이진트리의 구성으로 이루어져있고 각 자식노드 두개를 합한게 부모노드가 된다. 즉 머클트리의 루트는 모든 노드의 해시값을 요약한 값이라는 것.  
 >트랜잭션이 몇개가 되든 머클트리의 루트의 용량은 32byte로 항상 같다.  
@@ -36,4 +38,6 @@ Radix트리는 트리의 리프노드에 대한 경로를 고유하게 식별할
 
 # Serialization Concerns
 
-namespace의 디자이너는 주소의 인코딩 방식 외에도 주소를 저장하고 있는 데이터에 대해  serializing/deserializing 매커니즘을 정의해야합니다. domain-specific Transaction Processor는 validator가 기본적으로 제공하는 get set메소드를 가지고 있으며, get은 address를 byte배열로 리턴하고 set은 byte배열을 세팅할 수 있습니다. byte배열은 코어시스템에서는 그냥 봐서는 이해하기 힘들게 되어있습니다. namespace의 디자이너가 정의한 룰에 따라 deserialize를 해야 의미를 가진 데이터로 변하게 됩니다. 트랜잭션의 실행, 플랫폼 및 serialization 프레임워크의 여러 버전에서 serialization 스킴을 정하는 것은 매우 중요합니다. 순서화된 직렬화를 시행하지 않는 자료구조는 피해야합니다.(예: 집합, map, dicts) 요구되어지는 사항은 공간과 시간에 걸쳐서 byte배열을 일관되게 생성하는 것입니다. 동일한 byte배열이 생성되지 않는다면 데이터가 담겨있는 리프노드의 해시값이 다르다고 여겨지며 모든 부모노드가 루트로 돌아가게 됩니다. 이렇게 되면 몇몇개의 validator에서는 유효하다, 다른 validator에서는 블럭과 트랜잭션이 유효하지 않다 라는 결론이 나게 되므로 결정할수없는 문제에 봉착하게 됩니다.
+namespace의 디자이너는 주소의 인코딩 방식 외에도 주소를 저장하고 있는 데이터에 대해  serializing/deserializing 매커니즘을 정의해야합니다. domain-specific Transaction Processor는 validator가 기본적으로 제공하는 get set메소드를 가지고 있으며, get은 address를 byte배열로 리턴하고 set은 byte배열을 세팅할 수 있습니다.  
+byte배열은 코어시스템에서는 그냥 봐서는 이해하기 힘들게 되어있습니다. namespace의 디자이너가 정의한 룰에 따라 deserialize를 해야 의미를 가진 데이터로 변하게 됩니다. 트랜잭션의 실행, 플랫폼 및 serialization 프레임워크의 여러 버전에서 serialization 스킴을 정하는 것은 매우 중요합니다. 순서화된 직렬화를 시행하지 않는 자료구조는 피해야합니다.(예: 집합, map, dicts)  
+ 요구되어지는 사항은 공간과 시간에 걸쳐서 byte배열을 일관되게 생성하는 것입니다. 동일한 byte배열이 생성되지 않는다면 데이터가 담겨있는 리프노드의 해시값이 다르다고 여겨지며 모든 부모노드가 루트로 돌아가게 됩니다. 이렇게 되면 몇몇개의 validator에서는 유효하다, 다른 validator에서는 블럭과 트랜잭션이 유효하지 않다 라는 결론이 나게 되므로 결정할수없는 문제에 봉착하게 됩니다.
