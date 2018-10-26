@@ -78,7 +78,7 @@ InfluxDB Details->`userInfo`: influxDB의 유저정보(없어도됨)
 ## 5. Configure the Sawtooth Validator&REST API for Grafana
 
 이제 Grafana와 InfluxDB의 연동이 성공하였으니 Sawtooth네트워크와 연동해야합니다.  
->[공식문서](https://sawtooth.hyperledger.org/docs/core/nightly/master/sysadmin_guide/grafana_configuration.html#configure-the-sawtooth-validator-for-grafana)에서는 docker가 아닌 우분투위에서 sawtooth네트워크를 실행하는 방법을 설명하고 있습니다.  
+>[공식문서](https://sawtooth.hyperledger.org/docs/core/nightly/master/sysadmin_guide/grafana_configuration.html#configure-the-sawtooth-validator-for-grafana)에서는 docker가 아닌 우분투위에서 sawtooth네트워크를 실행하기 때문에 toml파일을 수정하는 방법을 설명하고 있습니다.
 >저는 docker위에서 sawtooth를 실행시키므로 yaml파일을 수정하는 방법을 소개하겠습니다.
 
 실행시킬 sawtooth네트워크의 docker-compose.yaml파일을 수정해봅시다.  
