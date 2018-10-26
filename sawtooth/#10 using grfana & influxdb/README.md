@@ -34,7 +34,7 @@ $ docker run -d -p 8086:8086 -v /var/lib/influx-data:/var/lib/influxdb \
 ~~~
 `INFLUXDB_DB`: DB이름  
 `INFLUXDB_HTTP_AUTH_ENABLED`: DB에 접근하기위한 인증절차   
-`INFLUXDB_ADMIN_USER` & `INFLUXDB_ADMIN_PASSWORD`: 관리자계정
+`INFLUXDB_ADMIN_USER` & `INFLUXDB_ADMIN_PASSWORD`: 관리자계정  
 `INFLUXDB_USER` & `INFLUXDB_USER_PASSWORD`: 일반계정
 
 
@@ -78,7 +78,8 @@ InfluxDB Details->`userInfo`: influxDB의 유저정보(없어도됨)
 ## 5. Configure the Sawtooth Validator&REST API for Grafana
 
 이제 Grafana와 InfluxDB의 연동이 성공하였으니 Sawtooth네트워크와 연동해야합니다.  
->[공식문서](https://sawtooth.hyperledger.org/docs/core/nightly/master/sysadmin_guide/grafana_configuration.html#configure-the-sawtooth-validator-for-grafana)에서는 docker가 아닌 우분투위에서 sawtooth네트워크를 실행하는 방법을 설명하고 있습니다. 저는 docker위에서 sawtooth를 실행시키므로 yaml파일을 수정하는 방법을 소개하겠습니다.
+>[공식문서](https://sawtooth.hyperledger.org/docs/core/nightly/master/sysadmin_guide/grafana_configuration.html#configure-the-sawtooth-validator-for-grafana)에서는 docker가 아닌 우분투위에서 sawtooth네트워크를 실행하는 방법을 설명하고 있습니다.  
+>저는 docker위에서 sawtooth를 실행시키므로 yaml파일을 수정하는 방법을 소개하겠습니다.
 
 실행시킬 sawtooth네트워크의 docker-compose.yaml파일을 수정해봅시다.  
 
@@ -173,7 +174,7 @@ validator와 마찬가지로 rest-api의 커맨드를 수정해주시면 됩니�
 
 ## 6. Configure Telegraf
 
-Telegraf는 InfluxDB의 제작사에서 제작한 시스템 모니터링 및 지표 수집 에이전트입니다. 간단히 말해서 sawtooth네트워크와 os의 여러 정보를 InfluxDB로 보내줍니다.  
+Telegraf는 InfluxDB의 제작사에서 제작한 시스템 모니터링 및 지표 수집 에이전트입니다. 간단히 말해서 sawtooth네트워크와 os의 여러 정보를 InfluxDB로 보내주는 역할을 합니다.
 
 그럼 Telegraf를 다운로드 받아봅시다.
 ~~~
